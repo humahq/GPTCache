@@ -182,6 +182,8 @@ class Milvus(VectorBase):
 
     def delete(self, ids):
         del_ids = ",".join([str(x) for x in ids])
+        if del_ids[2]=="[[]]":
+            del_ids = del_ids[1:-1]
         self.col.delete(f"id in [{del_ids}]")
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
