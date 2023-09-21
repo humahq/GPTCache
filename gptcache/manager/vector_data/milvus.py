@@ -74,7 +74,10 @@ class Milvus(VectorBase):
         index_params: dict = None,
         search_params: dict = None,
         local_mode: bool = False,
-        local_data: str = "./milvus_data"
+        local_data: str = "./milvus_data",
+        db_name: str = "",
+        token: str = "",
+        uri: str = ""
     ):
         if dimension <= 0:
             raise ValueError(
@@ -87,7 +90,7 @@ class Milvus(VectorBase):
         self.index_params = index_params
         if self._local_mode:
             self._create_local(port, local_data)
-        self._connect(host, port, user, password, secure)
+        self._connect(host, port, user, password, secure, db_name, token, uri)
         self._create_collection(collection_name)
         self.search_params = (
             search_params or self.SEARCH_PARAM[self.index_params["index_type"]]
@@ -102,7 +105,7 @@ class Milvus(VectorBase):
         self._server.listen_port = int(port)
         self._server.start()
 
-    def _connect(self, host, port, user, password, secure):
+    def _connect(self, host, port, user, password, secure, db_name="", token="", uri=""):
         try:
             i = [
                 connections.get_connection_addr(x[0])
@@ -119,7 +122,10 @@ class Milvus(VectorBase):
                 user=user,  # type: ignore
                 password=password,  # type: ignore
                 secure=secure,
-                timeout=10
+                timeout=10,
+                db_name=db_name,
+                token=token,
+                uri=uri
             )
 
     def _create_collection(self, collection_name):
@@ -182,9 +188,7 @@ class Milvus(VectorBase):
 
     def delete(self, ids):
         del_ids = ",".join([str(x) for x in ids])
-        if del_ids[2]=="[[]]":
-            del_ids = del_ids[1:-1]
-        self.col.delete(f"id in [{del_ids}]")
+        self.col.delete(f"id in {del_ids}")
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
         self.col.compact()
