@@ -105,7 +105,7 @@ def import_huggingface_hub():
 
 
 def import_onnxruntime():
-    _check_library("onnxruntime")
+    _check_library("onnxruntime", package="onnxruntime==1.14.1")
 
 
 def import_faiss():
@@ -258,7 +258,7 @@ def import_fastapi():
 
 def import_redis():
     _check_library("redis")
-    _check_library("redis_om")
+    _check_library("redis_om", package="redis-om")
 
 
 def import_starlette():
